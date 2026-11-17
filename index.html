@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>一起多存一百 · 一个人多存是多存，大家一起多存呢</title>
+<meta name="description" content="凯恩斯的节俭悖论，一手一手算给你看：一个小镇里几户人家每月少花一百、多存一百，钱少转一圈，大家的收入跟着缩，最后你自己到底多存了多少。">
+<style>
+  :root{--bg:#f2f4ef;--paper:#fff;--card:#f7f8f4;--ink:#1f2620;--ink2:#4e5a50;--mut:#7f8a80;--line:#d8ddd2;--rule:#e9ece4;--red:#b23a2b;--save:#2e7d5b;--save2:#a9d3bd;--house:#d9ddd3;--hi:#fff4d8;--key:#8b4a10;--neg:#b23a2b}
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);font:16px/1.6 -apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1000px;margin:0 auto;padding:22px 14px 72px}
+  h1{font-size:32px;line-height:1.2;margin:0 0 6px;letter-spacing:.04em}
+  .sub{color:var(--ink2);margin:0;font-size:15.5px}
+  .muted{color:var(--mut);font-size:13.5px}
+  .hide{display:none !important}
+  button,input{font:inherit}
+  button{cursor:pointer}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 4px}
+  .chip{background:var(--paper);border:1px solid var(--line);border-radius:999px;padding:5px 12px;font-size:13.5px;color:var(--ink2)}
+  .chip[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:#fff}
+  .panel{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:16px 18px;margin:14px 0;min-width:0}
+  .h2{font-size:15px;font-weight:700;margin:0 0 10px;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+  .err{background:#fbeceb;border:1px solid #e3b1aa;border-radius:6px;padding:10px 14px;color:var(--red);margin:10px 0}
+  .err ul{margin:4px 0 0;padding-left:20px}
+  .bad{border-color:var(--red) !important;background:#fbeceb !important}
+  .tot{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:2px 0 12px}
+  .tot div{border:1px solid var(--rule);background:var(--card);border-radius:6px;padding:7px 11px;min-width:0}
+  .tot span{display:block;font-size:12.5px;color:var(--mut)}
+  .tot b{font-size:28px;font-variant-numeric:tabular-nums;line-height:1.25;overflow-wrap:anywhere}
+  .tot div.key{background:var(--hi);border-color:#ecd59a} .tot div.key b{color:var(--key)}
+  .tot b.neg{color:var(--neg)} .tot b.lg{font-size:20px} .now b.lg{font-size:14px}
+  .tot small{display:block;color:var(--mut);font-size:12px;line-height:1.35}
+  .head{font-size:21px;font-weight:800;line-height:1.45;margin:0 0 6px;overflow-wrap:anywhere}
+  .why{color:var(--ink2);margin:0 0 8px;font-size:15px;overflow-wrap:anywhere}
+  .verdict{background:#eef6f1;border-left:3px solid var(--save);padding:6px 10px;font-size:14.5px;color:#235c43;margin:6px 0}
+  .acts{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 2px}
+  .act{background:#fff;border:1px solid #c9b98f;border-radius:6px;padding:6px 12px;font-size:14px;color:var(--key);text-align:left;max-width:100%;overflow-wrap:anywhere}
+  /* 小镇沙盘 */
+  .town{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:18px;align-items:start}
+  .grid{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:4px;max-width:360px}
+  .hs{aspect-ratio:1/1;border:0;padding:0;background:transparent;min-width:0}
+  .hs svg{width:100%;height:100%;display:block}
+  .hs .roof{fill:#b8bfb2} .hs .body{fill:var(--house)}
+  .hs.on .roof{fill:var(--save)} .hs.on .body{fill:var(--save2)}
+  .hs.me{outline:2px solid var(--key);outline-offset:1px;border-radius:2px}
+  .gridNote{font-size:13px;color:var(--mut);margin:6px 0 0;max-width:360px}
+  .step{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 8px}
+  .step input[type=range]{flex:1 1 180px;min-width:0}
+  .btn{background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:6px 12px;font-size:14px;color:var(--ink)}
+  .btn.pri{background:var(--ink);border-color:var(--ink);color:#fff}
+  .btn.sm{padding:3px 10px;font-size:13px}
+  .now{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin:4px 0 10px}
+  .now div{background:var(--card);border-radius:5px;padding:5px 9px;min-width:0}
+  .now span{display:block;font-size:12px;color:var(--mut)} .now b{font-variant-numeric:tabular-nums;font-size:18px;overflow-wrap:anywhere}
+  .nowText{font-size:14px;color:var(--ink2);margin:0 0 6px;overflow-wrap:anywhere}
+  svg.ch{width:100%;display:block}
+  .legend{display:flex;flex-wrap:wrap;gap:4px 16px;font-size:12.5px;color:var(--mut);margin-top:4px}
+  .legend i{display:inline-block;width:14px;height:3px;vertical-align:4px;margin-right:5px}
+  .two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px}
+  /* 对照与表单 */
+  table{border-collapse:collapse;width:100%;font-size:14px;font-variant-numeric:tabular-nums}
+  th,td{border-bottom:1px solid var(--rule);padding:6px 6px;text-align:right}
+  th:first-child,td:first-child{text-align:left}
+  th{color:var(--mut);font-weight:600;font-size:12.5px}
+  tr.cur td{background:var(--hi);font-weight:700}
+  .tbl{overflow-x:auto}
+  .form{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px 18px}
+  .form label{display:flex;flex-direction:column;gap:3px;font-size:14px;color:var(--ink2);min-width:0}
+  .form small{color:var(--mut);font-size:12.5px;line-height:1.45}
+  .form .in{display:flex;align-items:center;gap:6px} .form .u{white-space:nowrap;font-size:13.5px;color:var(--mut)}
+  .form input{width:100%;min-width:0;padding:5px 7px;border:1px solid var(--line);border-radius:4px;text-align:right;background:#fff}
+  .form input#place{text-align:left}
+  .form .wide{grid-column:1 / -1}
+  .dl{display:flex;flex-wrap:wrap;gap:8px}
+  .foot{color:var(--mut);font-size:13px;margin-top:22px}
+  .foot li{margin:3px 0}
+  @media (max-width:760px){
+    h1{font-size:27px} .head{font-size:18.5px} .tot b{font-size:23px}
+    .town,.two{grid-template-columns:minmax(0,1fr)}
+    .grid{max-width:none}
+    .tot{grid-template-columns:minmax(0,1fr) minmax(0,1fr)} .tot div.key{grid-column:1 / -1;order:-1}
+    .form{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+    .tot b.lg{font-size:16px}
+    .now{grid-template-columns:minmax(0,1fr) minmax(0,1fr)} .now div:last-child{grid-column:1 / -1}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>一起多存一百</h1>
+  <p class="sub">一个人每月少花一百、多存一百，存款就多一百。可要是镇上很多人家都这么做呢？你少花的钱是别人的收入，别人收入少了也会少花……这就是凯恩斯说的「节俭悖论」。这里把它一手一手算给你看。</p>
+
+  <div class="chips" id="presets"></div>
+  <p class="muted" id="presetNote"></p>
+
+  <section class="panel" id="res">
+    <div class="h2">最后你多存了多少 <span class="muted" id="saveTag"></span></div>
+    <div class="err hide" id="errBox"></div>
+    <div id="okBox">
+      <div class="tot" id="tot"></div>
+      <p class="head" id="headline"></p>
+      <p class="why" id="why"></p>
+      <div class="verdict hide" id="verdict"></div>
+      <div class="acts" id="acts"></div>
+    </div>
+  </section>
+
+  <section class="panel" id="townPanel">
+    <div class="h2">小镇 <span class="muted">一格代表 1% 的人家；点一格，就让这么多人家跟着多存</span></div>
+    <div class="town">
+      <div>
+        <div class="grid" id="grid" role="group" aria-label="跟着多存的人家比例"></div>
+        <p class="gridNote" id="gridNote"></p>
+      </div>
+      <div>
+        <div class="step">
+          <button type="button" class="btn sm" id="play">▶ 一手一手放</button>
+          <input type="range" id="t" min="0" max="21" step="1" aria-label="看第几手">
+          <span class="muted" id="tLab"></span>
+        </div>
+        <div class="now" id="now"></div>
+        <p class="nowText" id="nowText"></p>
+        <svg class="ch" id="chRounds" viewBox="0 0 520 230" role="img" aria-label="每一手之后的存款变化"></svg>
+        <div class="legend"><span><i style="background:#2e7d5b"></i>跟着多存的人家：每月存款比原来多多少</span><span><i style="background:#8f9a90;height:2px"></i>原本打算多存的数</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel" id="cmpPanel">
+    <div class="two">
+      <div>
+        <div class="h2">跟的人越多，你存下的越少</div>
+        <svg class="ch" id="chShare" viewBox="0 0 460 240" role="img" aria-label="跟着多存的人家比例与你存款变化"></svg>
+        <div class="legend"><span><i style="background:#2e7d5b"></i>你（跟着多存）</span><span><i style="background:#b23a2b"></i>全镇储蓄（每户平均）</span></div>
+      </div>
+      <div>
+        <div class="h2">几种情况对照</div>
+        <div class="tbl"><table id="cmp"></table></div>
+        <p class="muted" style="margin:6px 0 0">都是钱转到稳定以后、每月的变化（元）。</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="h2">小镇的设定</div>
+    <div class="form">
+      <label class="wide">叫它什么<input id="place" maxlength="30" placeholder="比如：一个 1000 户的小镇"></label>
+      <label>镇上有几户<span class="in"><input id="n" inputmode="numeric"><span class="u">户</span></span><small>2–1,000,000</small></label>
+      <label>每户每月收入<span class="in"><input id="y" inputmode="decimal"><span class="u">元</span></span><small>只影响收入的水平，不影响变化量</small></label>
+      <label>几户跟着多存<span class="in"><input id="k" inputmode="numeric"><span class="u">户</span></span><small>0 到全镇户数</small></label>
+      <label>每户每月多存<span class="in"><input id="s" inputmode="decimal"><span class="u">元</span></span><small>也就是每月少花这么多</small></label>
+      <label>每多收入 100 元，在镇上花<span class="in"><input id="c" inputmode="decimal"><span class="u">元</span></span><small>0–99；存起来或花到镇外的都算漏掉</small></label>
+      <label>每多收入 100 元，镇上多投资<span class="in"><input id="i" inputmode="decimal"><span class="u">元</span></span><small>0–50；店里生意好就多进货、多添设备</small></label>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="h2">带走</div>
+    <div class="dl">
+      <button type="button" class="btn pri" id="dlPng">结果卡 PNG</button>
+      <button type="button" class="btn" id="dlCsv">逐手明细 CSV</button>
+      <button type="button" class="btn" id="dlMd">文字 Markdown</button>
+      <button type="button" class="btn" id="dlJson">备份 JSON</button>
+      <button type="button" class="btn" id="impJson">导入备份</button>
+      <input type="file" id="impFile" accept=".json,application/json" class="hide">
+      <button type="button" class="btn" id="reset">恢复默认</button>
+    </div>
+    <p class="muted" style="margin:8px 0 0">设定只存在这台设备的浏览器里，不上传。</p>
+  </section>
+
+  <div class="foot">
+    <b>怎么算的、没算进去的事</b>
+    <ul>
+      <li>这是教科书里最简单的「收入—支出」模型：镇上一户花出去的钱，就是别的人家或店里的收入。每多收入 100 元，在镇上花掉一部分，剩下的存起来或花到镇外；店里生意好了还会多投资一点。少花的钱一手一手传下去，每传一手剩得更少，最后全镇收入少掉的是「少花的钱 ÷ (1 − 花掉的比例 − 投资的比例)」。</li>
+      <li>「一手」是钱从一个人手里转到下一个人手里一次，不是一个月；页面上的「几手后基本稳定」是指离最后的数只差 1% 以内。存款都按「每月」算：上一手收到的钱减去这一手花掉的钱。</li>
+      <li>为什么全镇存不下更多：存款最后要变成别人的投资才能真的「存下来」。投资不跟收入变时，全镇多存的钱一分不多；投资跟着收入走时，收入缩了投资也缩，全镇存款反而少了。</li>
+      <li>没算进去的：利率会下降、物价会调整、政府会花钱、外地人会来消费、存下的钱可以借给外地；真实经济里这些都会减轻或改变这个结果。默认小镇和所有数字都是虚构示例，不是对哪个真实地方的预测。</li>
+    </ul>
+  </div>
+</div>
+<script src="./core.js"></script>
+<script src="./ui.js"></script>
+</body>
+</html>
